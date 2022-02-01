@@ -1,6 +1,10 @@
 import sys
 from time import perf_counter
 
+
+__version__ = '1.0.0'
+
+
 class ProgressBar:
     """A simple progress bar similar to the one in Tensorflow
 
