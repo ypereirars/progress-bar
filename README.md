@@ -12,7 +12,7 @@ $ git clone https://github.com/ypereirars/progress-bar.git
 $ pip install .
 ```
 Then import the bar and use it:
-```
+```python
 from progress_bar import ProgressBar
 
 bar = ProgressBar(100)
@@ -21,7 +21,21 @@ for _ in range(100):
 ```
 Once it's bar is fully filled, the `update` method calls `finish`, producing the following output:
 
+```bash
+100/100 [===============================] - 9.93s 0.0993s/sample
 ```
+
+When passing extra info to update, it will append data to the end of bar:
+
+```python
+from progress_bar import ProgressBar
+
+bar = ProgressBar(100)
+for _ in range(100):
+    bar.update("loss: 3.0319 accuracy: 0.8784")
+```
+
+```bash
 100/100 [===============================] - 9.93s 0.0993s/sample - loss: 3.0319 accuracy: 0.8784
 ```
 
