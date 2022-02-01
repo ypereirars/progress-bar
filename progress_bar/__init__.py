@@ -2,8 +2,23 @@ import sys
 from time import perf_counter
 
 class ProgressBar:
+    """A simple progress bar similar to the one in Tensorflow
+
+    Returns:
+        ProgressBar: A progress bar
+    """
 
     def __init__(self, total_steps:int, length=30, fill="=", end=">", fill_space=" "):
+        """Creates a new progress bar for `total_steps` with length `length`
+        that will be filled with char `fill` with cap `end` filling `fill_space`.
+
+        Args:
+            total_steps (int): Total of steps
+            length (int, optional): Bar length. Defaults to 30.
+            fill (str, optional): Char to fill. Defaults to "=".
+            end (str, optional): Cap to bar. Defaults to ">".
+            fill_space (str, optional): Remaining space to be filled. Defaults to " ".
+        """
         self._total_steps = total_steps
         self._length = length
         self._fill = fill
@@ -14,22 +29,35 @@ class ProgressBar:
         self.reset()
 
     def reset(self):
+        """
+        Reset all params and statis
+        """
         self._progress_bar_step = self._increment
         self._current_step = 1
         self._step_info = ""
         self._last_time = 0
         self._time_between_updates = list()
 
-    def update(self, extra=None):
+    def update(self, extra:str=None):
+        """Update and increment bar counting
+
+        Args:
+            extra (str, optional): Extra information to append to bar. Defaults to None.
+        """
         self._increment_steps()
 
         if self._current_step <= self._total_steps:
             self._print(extra=extra)
         else:
             self.finish(extra)
-    
 
-    def _print(self, total_sec=" ", extra=None):
+    def _print(self, total_sec=" ", extra:str=None):
+        """Print bar to screen
+
+        Args:
+            total_sec (str, optional): When finishing, print total execution time. Defaults to " ".
+            extra (str, optional): Extra information to append to bar. Defaults to None.
+        """
         step_info = self._get_step_info()
         bar = self._bar_format.format(
             step_info=step_info,
@@ -43,6 +71,8 @@ class ProgressBar:
         sys.stdout.write('\r' + bar)
 
     def _increment_steps(self):
+        """Increment bar params
+        """
         if self._current_step % (self._total_steps/self._length) < 1:
             self._progress_bar_step = min(self._progress_bar_step + self._increment, self._length)
         self._current_step = self._current_step + 1
@@ -54,12 +84,23 @@ class ProgressBar:
         self._last_time = perf_counter()
 
     def _get_step_info(self):
+        """Get the current step information in the following format:
+        current step/total steps
+
+        Returns:
+            str: formated string to show current step.
+        """
         digits = len(str(self._total_steps))
         current_step = str(self._current_step).rjust(digits)
 
         return f"{current_step}/{self._total_steps}"
 
     def _get_bar(self):
+        """Get bar
+
+        Returns:
+            str: Bar string
+        """
         fill = self._fill * self._progress_bar_step
         fill_space_length = (self._length - self._progress_bar_step)
         end = self._fill if fill_space_length == 0 else self._end
@@ -68,12 +109,24 @@ class ProgressBar:
         return f"[{fill}{end}{fill_space}]"
 
     def _get_step_per_second(self):
+        """Get average step per update
+
+        Returns:
+            int: step per update
+        """
+
         if len(self._time_between_updates) == 0:
             return 0
 
         return sum(self._time_between_updates) / len(self._time_between_updates)
 
     def finish(self, extra=None):
+        """Last update to bar. 
+        When called, draw the final step with the total execution time.
+
+        Args:
+            extra (str, optional): Extra information to append to bar. Defaults to None.
+        """
         elapsed_time = perf_counter() - self._last_time
         self._current_step = self._total_steps
         self._progress_bar_step = self._length
