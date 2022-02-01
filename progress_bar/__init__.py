@@ -20,14 +20,16 @@ class ProgressBar:
         self._last_time = 0
         self._time_between_updates = list()
 
-    def update(self):
-        self._print()
+    def update(self, extra=None):
         self._increment_steps()
 
-        if self._current_step -1 == self._total_steps:
-            self.finish()
+        if self._current_step <= self._total_steps:
+            self._print(extra=extra)
+        else:
+            self.finish(extra)
+    
 
-    def _print(self, total_sec=" "):
+    def _print(self, total_sec=" ", extra=None):
         step_info = self._get_step_info()
         bar = self._bar_format.format(
             step_info=step_info,
@@ -35,6 +37,8 @@ class ProgressBar:
             total_sec=total_sec,
             steps_per_sec=self._get_step_per_second()
         )
+
+        bar = bar if extra is None else f"{bar} - {extra}"
 
         sys.stdout.write('\r' + bar)
 
@@ -69,13 +73,13 @@ class ProgressBar:
 
         return sum(self._time_between_updates) / len(self._time_between_updates)
 
-    def finish(self):
+    def finish(self, extra=None):
         elapsed_time = perf_counter() - self._last_time
         self._current_step = self._total_steps
         self._progress_bar_step = self._length
         self._time_between_updates.append(elapsed_time)
 
         total_exec = sum(self._time_between_updates)
-        self._print(f" {total_exec:.2f}s ")
+        self._print(total_sec=f" {total_exec:.2f}s ", extra=extra)
         sys.stdout.write("\n")
         self.reset()
