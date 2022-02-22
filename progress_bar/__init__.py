@@ -12,7 +12,7 @@ class ProgressBar:
         ProgressBar: A progress bar
     """
 
-    def __init__(self, total_steps:int, length=30, fill="=", end=">", fill_space=" "):
+    def __init__(self, total_steps:int, length=30, fill="=", end=">", fill_space=" ", finish_on_last_step=True):
         """Creates a new progress bar for `total_steps` with length `length`
         that will be filled with char `fill` with cap `end` filling `fill_space`.
 
@@ -30,6 +30,7 @@ class ProgressBar:
         self._fill_space = " " if fill_space == "" else fill_space
         self._increment = max(1, length // total_steps)
         self._bar_format = "{step_info} {bar} -{total_sec}{steps_per_sec:.4f}s/sample"
+        self._finish_on_last_step = finish_on_last_step
         self.reset()
 
     def reset(self):
@@ -52,7 +53,7 @@ class ProgressBar:
 
         if self._current_step <= self._total_steps:
             self._print(extra=extra)
-        else:
+        elif self._finish_on_last_step:
             self.finish(extra)
 
     def _print(self, total_sec=" ", extra:str=None):
